@@ -26,9 +26,20 @@ app.use(globalError)
 
 const port = process.env.PORT || 8000
 
-if(process.env.NODE_ENV !== 'production') {
-  app.listen(port, () => {
-    console.log(`Server running on PORT ${port}`)
-    connectDB()
-  })
+const startServer = async() => {
+  try {
+    await connectDB()
+
+    if(process.env.NODE_ENV !== 'production') {
+    app.listen(port, () => {
+      console.log(`Server running on PORT ${port}`)
+    })
+  }
+  } catch (error) {
+    console.error('Failed To Start Server:', error.message);
+    process.exit(1);
+  }
 }
+
+startServer();
+
