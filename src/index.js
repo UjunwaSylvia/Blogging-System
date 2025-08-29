@@ -9,37 +9,37 @@ configDotenv();
 
 const app = express();
 
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
+  res.send('Hello World from Vercel!');
+});
 
-app.use('/api/v1', router)
+app.use('/api/v1', router);
 
-app.get((req, res, next) => {
+app.use((req, res, next) => {
   next(new CustomError(`Route ${req.originalUrl} not found`, 404));
-})
+});
 
-app.use(globalError)
+app.use(globalError);
 
-const port = process.env.PORT || 8000
-
-const startServer = async() => {
-  try {
-    await connectDB()
-
-    if(process.env.NODE_ENV !== 'production') {
-    app.listen(port, () => {
-      console.log(`Server running on PORT ${port}`)
-    })
-  }
-  } catch (error) {
-    console.error('Failed To Start Server:', error.message);
-    process.exit(1);
-  }
+// ✅ Only listen locally
+if (process.env.NODE_ENV !== 'production') {
+  const port = process.env.PORT || 8000;
+  const startServer = async () => {
+    try {
+      await connectDB();
+      app.listen(port, () => {
+        console.log(`Server is running on port ${port}`);
+      });
+    } catch (error) {
+      console.error("Failed to start server:", error.message);
+      process.exit(1);
+    }
+  };
+  startServer();
 }
 
-startServer();
-
+// ✅ Export for Vercel (serverless)
+export default app;
